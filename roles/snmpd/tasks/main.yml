@@ -1,0 +1,20 @@
+---
+# tasks file for snmp
+
+- name: install net-snmp
+  apt: name=snmpd state=present
+  register: snmp_installed
+- name: create snmp configuration directory
+  action: file path=/etc/snmp state=directory owner=0 group=0 mode=0755
+- name: configure snmpd
+  template: src=snmpd.conf.j2 dest=/etc/snmp/snmpd.conf
+  notify: restart snmpd
+- name: configure snmpd defaults file
+  template: src=snmpd-defaults.j2 dest=/etc/default/snmpd
+  notify: restart snmpd
+- name: start snmpd
+  service: name=snmpd state=started enabled=yes
+- name: add host to Observium
+  shell: "/opt/observium/add_device.php {{ inventory_hostname }} {{ snmp_community }} v2c 161 udp"
+  delegate_to: observium.freifunk-rheinland.net
+  when: snmp_installed|changed

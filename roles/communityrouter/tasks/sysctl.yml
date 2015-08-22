@@ -1,0 +1,7 @@
+---
+# anycast routing won't work correctly without this
+
+- name: disable duplicate address detection
+  sysctl: name=net.ipv6.conf.br0.accept_dad value=0 state=present sysctl_file=/etc/sysctl.d/dad.conf
+  tags:
+    - sysctl

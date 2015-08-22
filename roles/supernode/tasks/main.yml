@@ -1,0 +1,32 @@
+# Setup Supernodes
+---
+
+- apt_key: keyserver=keyserver.ubuntu.com id=0x16EF3F64CB201D9C
+- apt_repository: repo='deb http://repo.universe-factory.net/debian/ sid main'
+  notify: update apt
+- apt: name={{ item }}
+  with_items:
+    - fastd
+    - bridge-utils
+
+- apt: name=batman-adv-dkms
+  notify: install batman module
+- lineinfile: dest=/etc/modules line="batman-adv"
+
+- file: path=/etc/fastd/10_backbone state=directory
+- file: path=/etc/fastd/20_gluon state=directory
+- file: path=/etc/fastd/20_gluon/peers state=directory # dummy directory, needed to run fastd
+
+- copy: src=fastd-blacklist.sh dest=/etc/fastd/fastd-blacklist.sh mode=0755
+- copy: src=fastd-status dest=/usr/local/bin/fastd-status mode=0755
+
+- group: name=fastd system=yes
+- user: name=fastd group=fastd system=yes
+
+- template: src=fastd-backbone.conf.j2 dest=/etc/fastd/10_backbone/fastd.conf backup=yes
+- template: src=fastd-gluon.conf.j2 dest=/etc/fastd/20_gluon/fastd.conf backup=yes
+
+- service: name=fastd state=started enabled=true
+
+# Set up a cronjob to retrieve the fastd blacklist
+- cron: name="retrieve blacklist" minute="*/5" job="/usr/bin/wget --quiet -O /etc/fastd/fastd-blacklist.json {{ blacklist_url }}"

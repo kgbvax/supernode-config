@@ -1,0 +1,7 @@
+# tasks file for community router
+---
+- include: bird.yml
+- include: dnsmasq.yml
+- include: iptables.yml
+- include: radvd.yml
+- include: sysctl.yml

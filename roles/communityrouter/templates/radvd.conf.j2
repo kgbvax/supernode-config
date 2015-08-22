@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+interface br0 {
+  AdvLinkMTU 1280;
+  AdvSendAdvert on;
+  MinRtrAdvInterval 3;
+  MaxRtrAdvInterval 10;
+  AdvSourceLLAddress off;
+  prefix {{ local_as.ipv6.prefix }}/64 {
+    AdvOnLink on;
+    AdvAutonomous on;
+    AdvPreferredLifetime 3600;
+    AdvValidLifetime 86400;
+    DeprecatePrefix on;
+  };
+  route ::/0 {
+    AdvRoutePreference high;
+  };
+  RDNSS {{ dns.resolver.ipv6 }} {};
+  DNSSL local {};
+};

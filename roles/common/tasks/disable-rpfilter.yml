@@ -1,0 +1,2 @@
+# Disable reverse path filter on all interfaces
+- sysctl: name=net.ipv4.conf.all.rp_filter value=0 state=present sysctl_file=/etc/sysctl.d/60-rp_filter.conf

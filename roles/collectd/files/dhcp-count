@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+HOSTNAME="${COLLECTD_HOSTNAME:-localhost}"
+INTERVAL="${COLLECTD_INTERVAL:-60}"
+
+while sleep "$INTERVAL"; do
+  VALUE=$(cat /var/lib/misc/dnsmasq.leases | wc -l)
+  echo "PUTVAL \"$HOSTNAME/dhcp/gauge-leases\" interval=$INTERVAL N:$VALUE"
+done

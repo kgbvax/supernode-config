@@ -1,0 +1,11 @@
+# Configure iptables firewall
+---
+- apt: name=iptables-persistent
+
+- template: src=iptables-v4.j2 dest=/etc/iptables/rules.v4
+  notify: reload iptables
+
+- template: src=iptables-v6.j2 dest=/etc/iptables/rules.v6
+  notify: reload iptables
+
+- service: name=iptables-persistent enabled=true

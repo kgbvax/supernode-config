@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+
+@version: 3.5
+@include "scl.conf"
+
+options {
+  stats_freq(0);
+  flush_lines(0);
+  time_reopen(10);
+  log_fifo_size(10000);
+  chain_hostnames(off);
+  use_dns(no);
+  use_fqdn(yes);
+  create_dirs(no);
+  keep_hostname(yes);
+  perm(0640);
+  group("log");
+};
+
+source src {
+  internal();
+  system();
+};
+
+destination observium {
+  udp("observium.freifunk-rheinland.net");
+  udp6("log.fluxent.de" port(51400));
+};
+
+log {
+  source(src);
+  destination(observium);
+};
+

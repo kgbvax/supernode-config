@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+HOSTNAME="${COLLECTD_HOSTNAME:-localhost}"
+INTERVAL="${COLLECTD_INTERVAL:-60}"
+
+while sleep "$INTERVAL"; do
+  VALUE=$(ip -6 n s dev br0 | grep 2a03:2260:40:0:.*REACHABLE | wc -l)
+  echo "PUTVAL \"$HOSTNAME/neighbors-ipv6/gauge-count\" interval=$INTERVAL N:$VALUE"
+done

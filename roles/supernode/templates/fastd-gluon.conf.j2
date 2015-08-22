@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+
+bind any:10040;
+cipher "aes128-ctr" use "openssl";
+include peers from "peers";
+interface "tap0";
+method "aes128-gcm";
+method "salsa2012+umac";
+method "salsa2012+gmac";
+method "null+salsa2012+umac";
+mtu 1406;
+secure handshakes yes;
+user "fastd";
+peer limit 125;
+status socket "/tmp/fastd.sock";
+forward no;
+
+on verify "/etc/fastd/fastd-blacklist.sh $PEER_KEY";
+
+secret "{{ fastd.private_key }}";
+
+on up "
+  ip link set address {{ fastd.mac_address }} dev $INTERFACE
+  ip link set up dev $INTERFACE
+  batctl -m bat0 if add $INTERFACE
+  batctl -m bat0 it {{ batman.interval }}
+  batctl -m bat0 bl disable
+  echo \"disabled\" > /sys/devices/virtual/net/$INTERFACE/batman_adv/no_rebroadcast
+  start-stop-daemon -b --start --exec /usr/sbin/alfred -- -mi alfred0
+  start-stop-daemon -b --start --exec /usr/sbin/batadv-vis -- -s
+";
+
+on down "
+  start-stop-daemon --stop --exec /usr/sbin/alfred -- -mi alfred0
+  start-stop-daemon --stop --exec /usr/sbin/batadv-vis -- -s
+";

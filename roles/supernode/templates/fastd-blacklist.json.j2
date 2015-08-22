@@ -1,0 +1,12 @@
+{
+  "peers":
+  [
+    {% for peer in blacklisted_peers %}
+    {
+      "pubkey": "{{ peer.pubkey }}",
+      "comment": "{{ peer.comment }}"
+    },
+    {% endfor %}
+  ]
+}
+

@@ -1,0 +1,15 @@
+# Configure BIRD routing daemon
+---
+- file: dest=/etc/bird state=directory
+- file: src=/etc/bird.conf dest=/etc/bird/bird.conf state=link force=yes
+- file: src=/etc/bird6.conf dest=/etc/bird/bird6.conf state=link force=yes
+
+- apt: name=bird state=present
+
+- template: src=bird.conf.j2 dest=/etc/bird.conf backup=yes validate='bird -pc %s'
+  notify: reload bird
+- template: src=bird6.conf.j2 dest=/etc/bird6.conf backup=yes validate='bird6 -pc %s'
+  notify: reload bird6
+
+- service: name=bird enabled=true
+- service: name=bird6 enabled=true

@@ -1,0 +1,4 @@
+---
+# handlers file for vnstat
+- name: restart vnstat
+  service: name=vnstat state=restarted

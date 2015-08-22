@@ -1,0 +1,22 @@
+---
+# tasks file for batadv-vis
+# Ubuntu Part
+- apt_key: keyserver=keyserver.ubuntu.com id=0x64a4ca186440c0cfd254f112b976bd29286cc7a4
+  when: ansible_distribution == 'Ubuntu'
+- apt_repository: repo="deb http://ppa.launchpad.net/freifunk-mwu/freifunk-ppa/ubuntu trusty main"
+  notify: update apt
+  when: ansible_distribution == 'Ubuntu'
+- apt: name=batadv-vis state=installed
+  when: ansible_distribution == 'Ubuntu'
+- template: src=batadv-vis.j2 dest=/etc/init/batadv-vis.conf
+  when: ansible_distribution == 'Ubuntu'
+#Debian wheezy part
+- apt_key: keyserver=keyserver.ubuntu.com id=0xED2BFD9878080351
+  when: ansible_distribution == 'Debian'
+- apt_repository: repo="deb http://images.freifunk-rheinland.net/apt/debian/ wheezy main"
+  notify: update apt
+  when: ansible_distribution == 'Debian'
+- apt: name=batadv-vis state=installed 
+  when: ansible_distribution == 'Debian'
+- template: src=batadv-vis.j2 dest=/etc/init/batadv-vis.conf
+  when: ansible_distribution == 'Debian'

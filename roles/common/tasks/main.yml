@@ -1,0 +1,5 @@
+# Every task needed
+---
+- include: kernelpanic.yml
+- include: configure-hostname.yml
+- include: configure-network.yml

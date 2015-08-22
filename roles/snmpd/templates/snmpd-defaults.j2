@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+
+SNMPDRUN=yes
+SNMPDOPTS='-Lsd -Lf /dev/null -u snmp -g snmp -I -smux,mteTrigger,mteTriggerConf -p /var/run/snmpd.pid 0.0.0.0 ::'

@@ -1,0 +1,9 @@
+# configure remote syslog
+---
+- apt: name=rsyslog state=absent
+- group: name=log system=yes
+- user: name=log group=log system=yes
+- apt: name=syslog-ng
+- template: src=syslog-ng.conf.j2 dest=/etc/syslog-ng/syslog-ng.conf
+  notify: restart syslog
+- service: name=syslog-ng state=started enabled=true

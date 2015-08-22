@@ -1,0 +1,4 @@
+# Configure network interfaces
+---
+- file: dest=/etc/network state=directory
+- template: src=interfaces.j2 dest=/etc/network/interfaces backup=yes

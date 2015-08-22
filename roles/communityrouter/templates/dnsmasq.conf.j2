@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+# interface
+interface=br0
+
+# DNS service
+no-resolv
+server=8.8.4.4
+server=8.8.8.8
+server=2001:4860:4860::8888
+server=2001:4860:4860::8848
+
+{% if gateway %}
+# DHCP service
+dhcp-authoritative
+dhcp-ignore-names
+dhcp-range={{ dhcp.start_address }},{{ dhcp.end_address }},3h
+dhcp-lease-max=51000
+dhcp-option-force=26,1280
+{% if ansible_distribution == "Ubuntu" %}
+quiet-dhcp
+{% endif %}
+{% endif %}

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+HOSTNAME="${COLLECTD_HOSTNAME:-localhost}"
+INTERVAL="${COLLECTD_INTERVAL:-60}"
+
+while sleep "$INTERVAL"; do
+  VALUE=$(/usr/local/bin/fastd-status -s /tmp/fastd.sock | grep "Connected Clients: " | cut -d " " -f 3)
+  echo "PUTVAL \"$HOSTNAME/fastd-peers/gauge-count\" interval=$INTERVAL N:$VALUE"
+done

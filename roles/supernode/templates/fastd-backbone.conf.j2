@@ -1,0 +1,109 @@
+# {{ ansible_managed }}
+
+bind any:10042;
+cipher "aes128-ctr" use "openssl";
+interface "tap1";
+method "aes128-gcm";
+mtu 1434;
+secure handshakes yes;
+user "fastd";
+status socket "/tmp/fastdbb.sock";
+forward no;
+
+secret "{{ fastd.private_key }}";
+
+# Supernodes
+{% for host in groups['supernodes'] %}
+peer "{{ hostvars[host].cname }}" {
+  key "{{ hostvars[host].fastd.public_key }}";
+  remote "{{ host }}" port 10042;
+}
+
+{% endfor %}
+# Map Servers
+{% if groups['mapservers'] is defined %}
+{% for host in groups['mapservers'] %}
+peer "{{ hostvars[host].cname }}" {
+  key "{{ hostvars[host].fastd.public_key }}";
+  remote "{{ host }}" port 10042;
+}
+
+{% endfor %}
+{% endif %}
+on up "
+ip addr flush dev br0
+
+# Batman configuration
+batctl -m bat0 if add $INTERFACE
+batctl -m bat0 it {{ batman.interval }}
+batctl -m bat0 bl disable
+echo \"enabled\" > /sys/devices/virtual/net/$INTERFACE/batman_adv/no_rebroadcast
+
+{% if gateway %}
+# Gateway
+ip addr add {{ dhcp.gateway_ip }}/16 dev br0
+batctl -m bat0 gw server 100mbit/100mbit
+{% else %}
+# No Gateway
+batctl -m bat0 gw client
+{% endif %}
+
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.conf.all.rp_filter=0
+
+sysctl -w net.ipv6.conf.all.forwarding=1
+sysctl -w net.ipv6.conf.all.accept_ra=0
+sysctl -w net.ipv6.conf.all.forwarding=1
+
+sysctl -w net.bridge.bridge-nf-call-arptables=0
+sysctl -w net.bridge.bridge-nf-call-ip6tables=0
+sysctl -w net.bridge.bridge-nf-call-iptables=0
+
+ip link set address {{ fastd.mac_address2 }} dev $INTERFACE
+ip link set up dev $INTERFACE
+
+ip link set address {{ fastd.mac_address2 }} dev $INTERFACE
+ip link set address {{ fastd.mac_address2 }} dev bat0
+ip link set up dev bat0
+
+brctl addbr br0
+brctl addif br0 bat0
+brctl stp br0 off
+ip link set dev br0 promisc on
+
+# Anycast for IPv6 routing and DNS resolving
+sysctl -w net.ipv6.conf.br0.accept_dad=0
+ip -6 addr flush dev br0
+{% if gateway %}
+sysctl -w net.ipv6.conf.br0.autconf=0
+ip -6 addr add fe80::1/64 dev br0
+ip -6 addr add {{ local_as.ipv6.prefix }}1/64 dev br0
+{% endif %}
+
+# IP Routing rules to keep Freifunk seperate
+ip rule flush
+ip rule add iif br0 table 16 priority 15767
+ip rule add iif tun0 table 16 priority 15767
+ip rule add iif tun1 table 16 priority 15767
+ip rule add to 10.0.0.0/8 table 16 priority 15767
+ip rule add to 172.22.0.0/12 table 16 priority 15767
+ip rule add from all table main priority 32766
+ip rule add from all table default priority 32767
+
+{% for address in loopback_addresses %}
+ip rule add from {{ address }} table 16 priority 15767
+{% endfor %}
+
+ip -6 rule flush
+ip -6 rule add iif br0 table 16 priority 15767
+ip -6 rule add iif tun0 table 16 priority 15767
+ip -6 rule add iif tun1 table 16 priority 15767
+ip -6 rule add from 2a03:2260:40::/48 table 16 priority 15767
+ip -6 rule add from all table main priority 32766
+ip -6 rule add from all table default priority 32767
+
+ip link set mtu 1400 dev tun1
+ip link set mtu 1400 dev tun0
+ip link set up dev br0
+";
+

@@ -1,0 +1,13 @@
+---
+gateway: true
+interfaces:
+  - name: tap0
+    label: Mesh
+  - name: tap1
+    label: Backbone
+  - name: eth0
+    label: Ethernet
+  - name: tun0
+    label: Tunnel 0
+  - name: tun1
+    label: Tunnel 1

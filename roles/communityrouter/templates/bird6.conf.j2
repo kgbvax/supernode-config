@@ -1,0 +1,46 @@
+# {{ ansible_managed }}
+
+router id {{ loopback_addresses[0] }};
+log syslog all;
+
+protocol kernel {
+        export all;
+        import all;
+        device routes;
+        kernel table 16;
+};
+
+protocol device {
+        scan time 8;
+};
+
+protocol static {
+        route {{ local_as.ipv6.prefix }}/48 via "lo";
+        route {{ local_as.ipv6.prefix }}/64 via "br0";
+        route {{ gre.tun0.ipv6.prefix }}/{{ gre.tun0.ipv6.netmask }} via "tun0";
+        route {{ gre.tun1.ipv6.prefix }}/{{ gre.tun1.ipv6.netmask }} via "tun1";
+};
+
+filter hostroute {
+        if net ~ {{ local_as.ipv6.prefix }}/48 then accept; 
+        reject;
+};
+
+template bgp uplink {
+        local as {{ local_as.number }};
+        import all;
+        export filter hostroute;
+        multihop 64;
+        default bgp_local_pref 200;
+};
+
+{% if peer_as is defined %}
+{% for peer in peer_as %}
+{% for neighbor in peer.neighbors %}
+protocol bgp {{ neighbor.name }} from uplink {
+  source address {{ neighbor.ipv6.source_address }};
+  neighbor {{ neighbor.ipv6.address }} as {{ peer.number }};
+};
+{% endfor %}
+{% endfor %}
+{% endif %}

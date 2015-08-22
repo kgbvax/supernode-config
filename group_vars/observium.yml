@@ -1,0 +1,5 @@
+---
+ansible_python_interpreter: /usr/bin/python2
+snmp_community: XbxKP1LfE3JB0XFF
+admins:
+  - nomaster

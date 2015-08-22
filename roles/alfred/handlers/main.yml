@@ -1,0 +1,6 @@
+---
+# handlers file for alfred
+- name: update apt
+  apt: update_cache=yes
+- name: restart alfred
+  service: name=alfred state=restarted

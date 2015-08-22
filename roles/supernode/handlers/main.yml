@@ -1,0 +1,10 @@
+---
+# handlers file for supernode
+- name: restart fastd
+  service: name=fastd state=restarted
+- name: get repo key
+  apt_key: keyserver=keyserver.ubuntu.com id=0x16EF3F64CB201D9C
+- name: update apt
+  apt: update_cache=yes
+- name: install batman module
+  command: "dkms install --force batman-adv/2013.4.0"

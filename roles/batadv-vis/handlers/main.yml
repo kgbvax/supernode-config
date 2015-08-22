@@ -1,0 +1,6 @@
+---
+# handlers file for batadv-vis
+- name: update apt
+  apt: update_cache=yes
+- name: restart batadv-vis
+  service: name=batadv-vis state=restarted

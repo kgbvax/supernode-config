@@ -1,0 +1,51 @@
+# {{ ansible_managed }}
+
+router id {{ loopback_addresses[0] }};
+
+log syslog all;
+
+protocol direct {
+  interface "*";
+};
+
+protocol kernel {
+  device routes;
+  import all;
+  export all;
+  kernel table 16;
+};
+
+protocol device {
+  scan time 8;
+};
+
+function is_default() {
+  return (net ~ [0.0.0.0/0]);
+};
+
+filter hostroute {
+  {% for address in loopback_addresses %}
+  if net ~ {{ address }}/32 then accept;
+  {% endfor %}
+  reject;
+};
+
+template bgp uplink {
+  local as {{ local_as.number }};
+  import where is_default();
+  export filter hostroute;
+  next hop self;
+  multihop 64;
+  default bgp_local_pref 200;
+};
+
+{% if peer_as is defined %}
+{% for peer in peer_as %}
+{% for neighbor in peer.neighbors %}
+protocol bgp {{ neighbor.name }} from uplink {
+  source address {{ neighbor.ipv4.source_address }};
+  neighbor {{ neighbor.ipv4.address }} as {{ peer.number }};
+};
+{% endfor %}
+{% endfor %}
+{% endif %}

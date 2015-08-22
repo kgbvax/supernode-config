@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+*filter
+:INPUT ACCEPT
+:FORWARD DROP
+:OUTPUT ACCEPT
+-A FORWARD -i br0 -o tun+ -s {{ local_as.ipv6.prefix }}/{{ local_as.ipv6.netmask }} -j ACCEPT -m comment --comment "ipv6-out"
+-A FORWARD -i tun+ -o br0 -d {{ local_as.ipv6.prefix }}/{{ local_as.ipv6.netmask }} -j ACCEPT -m comment --comment "ipv6-in"
+COMMIT

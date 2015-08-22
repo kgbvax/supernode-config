@@ -1,0 +1,7 @@
+# Update all packages
+---
+- name: backports package repo
+  apt_repository: repo="deb http://http.debian.net/debian wheezy-backports main" state=present
+  when: ansible_distribution_release == "wheezy"
+- name: install updates
+  apt: state=latest update_cache=yes

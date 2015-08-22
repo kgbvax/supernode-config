@@ -1,0 +1,10 @@
+---
+# enable automatic reboot on kernel panic and oops events
+
+- name: enabling reboot on kernel oops
+  sysctl: name=kernel.panic_on_oops value=1 sysctl_file=/etc/sysctl.d/kernel_oops.conf
+  tags: sysctl
+
+- name: enabling reboot on kernel panic
+  sysctl: name=kernel.panic value=1 sysctl_file=/etc/sysctl.d/kernel_panic.conf
+  tags: sysctl

@@ -1,0 +1,17 @@
+---
+# handlers file for communityrouter
+- name: reload bird
+  command: "birdc configure soft"
+- name: reload bird6
+  command: "birdc6 configure soft"
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted
+
+- name: reload iptables
+  service: name=iptables-persistent state=restarted
+
+- name: restart radvd
+  service: name=radvd state=restarted
+- name: update apt
+  apt: update_cache=yes 

@@ -1,0 +1,12 @@
+---
+# tasks file for vnstat
+- name: install vnstat package
+  apt: name=vnstat
+- name: configure vnstat
+  template: src=vnstat.conf.j2 dest=/etc/vnstat.conf
+  notify: restart vnstat
+- name: add interfaces
+  command: "/usr/bin/vnstat -u -i {{ item.name }} --nick '{{ item.label }}' creates=/var/lib/vnstat/{{ item.name }}"
+  with_items: interfaces
+- name: start vnstat
+  service: name=vnstat enabled=true

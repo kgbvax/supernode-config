@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+*nat
+:PREROUTING ACCEPT
+:INPUT ACCEPT
+:OUTPUT ACCEPT
+:POSTROUTING ACCEPT
+-A POSTROUTING -s {{ local_as.ipv4.network }}/{{ local_as.ipv4.netmask }} -o tun+ -j SNAT --to-source {{ loopback_addresses[0] }}
+COMMIT
+*filter
+:INPUT ACCEPT
+:FORWARD DROP
+:OUTPUT ACCEPT
+-A FORWARD -o tun+ -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200 -m comment --comment "ipv4-mss-fix"
+-A FORWARD -i br0 -o tun+ -s {{ local_as.ipv4.network }}/{{ local_as.ipv4.netmask }} -j ACCEPT -m comment --comment "ipv4-out"
+-A FORWARD -i tun+ -o br0 -d {{ local_as.ipv4.network }}/{{ local_as.ipv4.netmask }} -j ACCEPT -m comment --comment "ipv4-in"
+COMMIT

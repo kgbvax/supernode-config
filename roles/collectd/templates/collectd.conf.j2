@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+Hostname "{{ inventory_hostname }}"
+
+LoadPlugin cpu
+LoadPlugin exec
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin network
+
+<Plugin exec>
+  Exec nobody "/usr/local/bin/dhcp-count"
+  Exec nobody "/usr/local/bin/ipv6-count"
+  Exec nobody "/usr/local/bin/ipv4-count"
+  Exec fastd "/usr/local/bin/fastd-count"
+  Exec nobody "/usr/local/bin/bandwidth-count"
+</Plugin>
+
+<Plugin network>
+  Server "log.fluxent.de" "25826"
+</Plugin>

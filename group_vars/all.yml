@@ -1,0 +1,30 @@
+---
+blacklist_url: https://raw.githubusercontent.com/ffruhr/fastdbl/master/fastd-blacklist.json
+snmp_community: XbxKP1LfE3JB0XFF
+ansible_python_interpreter: /usr/bin/python2
+gateway: false
+admins:
+  - cyrusfox
+  - nomaster
+  - takt
+  - thomasdotwtf
+dns:
+  search_domain: .local
+  resolver:
+    ipv6: fe80::1
+local_as:
+  number: 65078
+  name: Freifunk Rheinufer
+  ipv6:
+    prefix: "2a03:2260:40::"
+    netmask: 48
+  ipv4:
+    network: 10.40.0.0
+    netmask: 16
+loopback_addresses:
+  - 127.0.1.1
+batman:
+  interval: 5000
+interfaces:
+  - name: eth0
+    label: Ethernet

@@ -1,0 +1,4 @@
+---
+# handlers file for syslog
+- name: restart syslog
+  service: name=syslog-ng state=restarted

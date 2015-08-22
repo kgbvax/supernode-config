@@ -1,0 +1,17 @@
+# Configure Rheinufer Supernodes
+---
+- hosts: supernodes
+  roles:
+    - {role: common, tags: common}
+    - {role: syslog, tags: syslog}
+    - {role: collectd, tags: collectd}
+    - {role: supernode, tags: supernode}
+    - {role: alfred, tags: alfred}
+    - {role: batadv-vis, tags: batadv-vis}
+    - {role: snmpd, tags: snmpd}
+    - {role: vnstat, tags: vnstat}
+
+- hosts: supernodes-netcup
+  roles:
+    - {role: communityrouter, tags: communityrouter}
+
